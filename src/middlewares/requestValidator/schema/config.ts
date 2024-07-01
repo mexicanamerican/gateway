@@ -62,6 +62,9 @@ export const configSchema: any = z
     // Google Vertex AI specific
     vertex_project_id: z.string().optional(),
     vertex_region: z.string().optional(),
+    // OpenAI specific
+    openai_project: z.string().optional(),
+    openai_organization: z.string().optional(),
   })
   .refine(
     (value) => {
@@ -70,6 +73,10 @@ export const configSchema: any = z
       const hasModeTargets =
         value.strategy !== undefined && value.targets !== undefined;
       const isOllamaProvider = value.provider === OLLAMA;
+      const isVertexAIProvider =
+        value.provider === GOOGLE_VERTEX_AI &&
+        value.vertex_project_id &&
+        value.vertex_region;
       const hasAWSDetails =
         value.aws_access_key_id && value.aws_secret_access_key;
 
@@ -80,7 +87,8 @@ export const configSchema: any = z
         value.retry ||
         value.request_timeout ||
         isOllamaProvider ||
-        hasAWSDetails
+        hasAWSDetails ||
+        isVertexAIProvider
       );
     },
     {
